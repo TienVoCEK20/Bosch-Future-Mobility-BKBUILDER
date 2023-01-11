@@ -84,6 +84,7 @@ if enableRc:
 
     # serial handler process
     shProc = SerialHandlerProcess([rcShR], [])
+    print(rcShR)
     allProcesses.append(shProc)
 
     rcProc = RemoteControlReceiverProcess([],[rcShS])
