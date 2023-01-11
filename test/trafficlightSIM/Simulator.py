@@ -49,7 +49,7 @@ class sim(Thread):
         
         # Communication parameters, create and bind socket
         self.PORT = 50007
-        self.BCAST_ADDRESS = '<broadcast>'
+        self.BCAST_ADDRESS = '192.168.0.102'
 
         # Create a UDP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -99,7 +99,7 @@ class sim(Thread):
                 print("Sending data failed with error: " + str(e))
 
             # wait for 0.1 s before next broadcast msg
-            time.sleep(0.1)
+            time.sleep(1)
 
     def start(self):
         """Method for starting the process.
@@ -131,7 +131,7 @@ class sim(Thread):
         value = {"id":id, "state":state}
         message = json.dumps(value)
         # Debug message
-        # print('sending {!r}'.format(message))
+        print('sending {!r}'.format(message))
         sent = self.sock.sendto(message.encode('utf-8'), self.server_address)
 
 def runAdvertiser():
@@ -145,7 +145,7 @@ def runAdvertiser():
     Adv.start()
     # Wait until 60 seconds passed
     while (time.time()-start_time < 60):
-        time.sleep(0.5)
+        time.sleep(1)
     # Stop the broadcaster
     Adv.stop()
 

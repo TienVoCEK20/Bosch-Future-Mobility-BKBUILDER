@@ -28,6 +28,7 @@
 
 import json
 import socket
+import time
 
 from threading       import  Thread
 from multiprocessing import  Pipe
@@ -36,6 +37,38 @@ from src.utils.remotecontrol.RcBrainThread              import RcBrainThread
 from src.utils.remotecontrol.KeyboardListenerThread     import KeyboardListenerThread
 from src.templates.workerprocess                        import WorkerProcess
 
+activate_pid = {
+    "action": "4",
+    "activate": True
+}
+speed = {
+  "action": "1",
+  "speed": float(0.09)
+}
+
+brake = {  
+    "action": "3",
+    "brake (steerAngle)": float(20)
+}
+
+encoder = {
+    "action": "5",
+    "activate": True
+}
+
+# pid_control = {
+#     "action": "6",
+#     "kp"      = float(1),
+#     "ki"      = float(1),
+#     "kd"      = float(1),
+#     "tf"      = float(1)
+# }
+
+distance = {
+    "action": "7",
+    "distance": float(1),
+    "speed": float(0.09)
+}
 class RemoteControlTransmitterProcess(Thread):
     # ===================================== INIT==========================================
     def __init__(self,  inPs = [], outPs = []):
@@ -52,9 +85,11 @@ class RemoteControlTransmitterProcess(Thread):
         self.listener  =  KeyboardListenerThread([self.lisBrS])
 
         self.port      =  12244
-        self.serverIp  = '192.168.1.2'
+        self.serverIp  = '192.168.0.104'
 
         self.threads = list()
+
+        self.runOnce = 1
     # ===================================== RUN ==========================================
     def run(self):
         """Apply initializing methods and start the threads. 
@@ -87,7 +122,40 @@ class RemoteControlTransmitterProcess(Thread):
                                 family  = socket.AF_INET, 
                                 type    = socket.SOCK_DGRAM
                             )
-
+    def keepGoing(self, speed):
+        _speed =    {
+                    "action": "1",
+                    "speed": float(0.09)
+                }  
+        command = json.dumps(_speed).encode()
+        print(command) 
+        self.client_socket.sendto(command,(self.serverIp,self.port))      
+    def goForward(self, distance, speed):
+        _distance = {
+                    "action": "7",
+                    "distance": float(distance),
+                    "speed": float(speed)
+                }
+        command = json.dumps(_distance).encode()
+        print(command) 
+        self.client_socket.sendto(command,(self.serverIp,self.port))
+    def steerAngle(self, steerAngle):
+        _distance = {
+                    "action": "2",
+                    "steerAngle": float(steerAngle)
+                }
+        command = json.dumps(_distance).encode()
+        print(command) 
+        self.client_socket.sendto(command,(self.serverIp,self.port))
+    def brake(self, break_steerAngle):
+        _brake = {  
+                "action": "3",
+                "brake (steerAngle)": float(break_steerAngle)
+            }
+        command = json.dumps(_brake).encode()
+        print(command) 
+        self.client_socket.sendto(command,(self.serverIp,self.port))
+        
     # ===================================== SEND COMMAND =================================
     def _send_command_thread(self, inP):
         """Transmite the command to the remotecontrol receiver. 
@@ -98,10 +166,40 @@ class RemoteControlTransmitterProcess(Thread):
             Input pipe. 
         """
         while True:
-            key = inP.recv()
-
-            command = self.rcBrain.getMessage(key)
-            if command is not None:
-                command = json.dumps(command).encode()
-
+        #     key = inP.recv()
+        #     print('key: '+ key)
+        #     command = self.rcBrain.getMessage(key)
+        #     if command is not None:
+        #         command = json.dumps(command).encode()
+        #         print(command)
+        #         self.client_socket.sendto(command,(self.serverIp,self.port))
+            if self.runOnce:
+                self.runOnce = 0
+                command = json.dumps(activate_pid).encode()
+                print(command) 
                 self.client_socket.sendto(command,(self.serverIp,self.port))
+                # command = json.dumps(speed).encode()
+                # print(command) 
+                # self.client_socket.sendto(command,(self.serverIp,self.port))
+                # time.sleep(3)
+                # self.brake(10)
+                self.keepGoing(0.09)
+                self.steerAngle(20)
+                time.sleep(3)
+                self.steerAngle(-20)
+                time.sleep(3)
+                self.brake(10)
+                # command = json.dumps(encoder).encode()
+                # print(command) 
+                # self.client_socket.sendto(command,(self.serverIp,self.port))
+                
+                # time.sleep(3)
+
+                # command = json.dumps(brake).encode()
+                # print(command) 
+                # self.client_socket.sendto(command,(self.serverIp,self.port))
+
+                # command = json.dumps(distance).encode()
+                # print(command) 
+                # self.client_socket.sendto(command,(self.serverIp,self.port))
+                #self.goForward(0.5,0.09)

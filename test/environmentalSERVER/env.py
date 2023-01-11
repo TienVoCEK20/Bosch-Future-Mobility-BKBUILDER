@@ -25,12 +25,12 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
-
+import sys 
+sys.path.append('.')
 from serverconfig import ServerConfig
 from carclientserver import CarClientServerThread
 from serverbeacon import ServerBeaconThread
 from data_collector import MarkerDataSet
-
 import logging
 import time
 
@@ -47,7 +47,7 @@ class ObstacleHandlerSystemServer:
         self.__logger = logging.getLogger('root')
 
         self.markerSet = MarkerDataSet()
-        self.serverconfig = ServerConfig('<broadcast>', 23456, 23466)
+        self.serverconfig = Serverload_private_keyConfig('192.168.0.102', 23456, 23466)
         privateKeyFile = "privatekey_server_test.pem"
         clientkeys = "keys/"
 

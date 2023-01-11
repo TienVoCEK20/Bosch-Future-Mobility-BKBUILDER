@@ -57,7 +57,7 @@ class Broadcaster(Thread):
         
         # Communication parameters, create and bind socket
         self.PORT = PORT
-        self.BCAST_ADDRESS = '<broadcast>'
+        self.BCAST_ADDRESS = '192.168.0.101'
 
         # Create a UDP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

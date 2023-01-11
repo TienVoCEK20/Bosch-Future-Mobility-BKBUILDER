@@ -74,7 +74,7 @@ class CameraReceiverProcess(WorkerProcess):
         """Initialize the socket server. 
         """
         self.port       =   2244
-        self.serverIp   =   '0.0.0.0'
+        self.serverIp   =   '192.168.0.102'
         
         self.server_socket = socket.socket()
         self.server_socket.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
@@ -98,8 +98,11 @@ class CameraReceiverProcess(WorkerProcess):
             while True:
 
                 # decode image
+                #print("hello from pc")
                 image_len = struct.unpack('<L', self.connection.read(struct.calcsize('<L')))[0]
+                #print(image_len)
                 bts = self.connection.read(image_len)
+                #print(bts)
 
                 # ----------------------- read image -----------------------
                 image = np.frombuffer(bts, np.uint8)
