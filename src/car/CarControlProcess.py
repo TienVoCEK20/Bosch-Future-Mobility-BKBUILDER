@@ -19,28 +19,39 @@ class CarControl(WorkerProcess):
         """
 
         super(CarControl,self).__init__( inPs, outPs)
+        self.control = outPs
+    def keepGoing(self, speed):
+        _speed =    {
+                    "action": "1",
+                    "speed": float(speed)
+                }  
+        command = json.dumps(_speed).encode()
+        print(command) 
+        self.control.send(command)
+    def goForward(self, distance, speed):
+        _distance = {
+                    "action": "7",
+                    "distance": float(distance),
+                    "speed": float(speed)
+                }
+        command = json.dumps(_distance).encode()
+        print(command) 
+        self.control.send(command)
+    def steerAngle(self, steerAngle):
+        _distance = {
+                    "action": "2",
+                    "steerAngle": float(steerAngle)
+                }
+        command = json.dumps(_distance).encode()
+        print(command) 
+        self.control.send(command)
+    def brake(self, break_steerAngle):
+        _brake = {  
+                "action": "3",
+                "brake (steerAngle)": float(break_steerAngle)
+            }
+        command = json.dumps(_brake).encode()
+        print(command) 
+        self.control.send(command)
 
-    # ===================================== RUN ==========================================
-    def run(self):
-        """Apply the initializing methods and start the threads
-        """
-        super(CarControl,self).run()
-
-    # ===================================== INIT THREADS =================================
-    def _init_threads(self):
-        """Initialize the read thread to transmite the received messages to other processes. 
-        """
-        readTh = Thread(name='ReceiverCommandThread',target = self._read_stream, args = (self.outPs, ))
-        self.threads.append(readTh)
-
-    # ===================================== READ STREAM ==================================
-    def _read_stream(self, outPs):
-        """Receive the message and forwards them to the SerialHandlerProcess. 
-        
-        Parameters
-        ----------
-        outPs : list(Pipe)
-            List of the output pipes.
-        """
-        outPs[0].send()
         
