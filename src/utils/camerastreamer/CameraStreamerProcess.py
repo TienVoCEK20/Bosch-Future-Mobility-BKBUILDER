@@ -87,6 +87,7 @@ class CameraStreamerProcess(WorkerProcess):
                     self.client_socket.connect((self.serverIp, self.port))
                     self.client_socket.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
                     self.connection = self.client_socket.makefile('wb') 
+                    print("CONNECTED")
                 except ConnectionRefusedError as error:
                     time.sleep(0.5)
                     pass
@@ -105,9 +106,11 @@ class CameraStreamerProcess(WorkerProcess):
             Input pipe to read the frames from CameraProcess or CameraSpooferProcess. 
         """
         encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 70]
-
+        #ERROR - NOT RUNNING
+        print("RAN")
         while True:
             try:
+                print("RECEIVED")
                 stamps, image = inP.recv()
                  
                 result, image = cv2.imencode('.jpg', image, encode_param)

@@ -78,7 +78,7 @@ class CameraThread(ThreadWithStop):
                                     resize          =   self.imgSize)
         else:
             print("GET")
-            self._streams()
+            self.print_frame()
         # record mode
         if self.recordMode:
             self.camera.stop_recording()
@@ -119,7 +119,17 @@ class CameraThread(ThreadWithStop):
             res += '_' + str(data)  
 
         return res
-
+    
+    def print_frame(self):
+        #ERROR: ONLY READ ONCE AND DON'T READ ANY MORE
+        
+        _, data = self.camera.read()
+        stamp = time.time()
+        print(data.shape)
+        # output image and time stamp
+        # Note: The sending process can be blocked, when doesn't exist any consumer process and it reaches the limit size.
+        for outP in self.outPs:
+            outP.send([[stamp], data])        
     #================================ STREAMS ============================================
     def _streams(self):
         """Stream function that actually published the frames into the pipes. Certain 

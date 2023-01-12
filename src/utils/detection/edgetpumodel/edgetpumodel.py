@@ -7,7 +7,7 @@ import yaml
 import numpy as np
 import pycoral.utils.edgetpu as etpu
 from pycoral.adapters import common
-from nms import non_max_suppression
+from edgetpumodel.nms import non_max_suppression
 import cv2
 import json
 
