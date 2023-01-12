@@ -1,3 +1,4 @@
-RTIMULib
+numpy
+opencv-python
 picamera
 pyserial

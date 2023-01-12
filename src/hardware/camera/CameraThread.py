@@ -57,6 +57,8 @@ class CameraThread(ThreadWithStop):
         #output 
         self.outPs        =   outPs
 
+        #is PiCam or Webcam
+        self.isPi = False #default
     #================================ RUN ================================================
     def run(self):
         """Apply the initializing methods and start the thread. 
@@ -68,11 +70,15 @@ class CameraThread(ThreadWithStop):
             self.camera.start_recording('picam'+ self._get_timestamp()+'.h264',format='h264')
 
         # Sets a callback function for every unpacked frame
-        self.camera.capture_sequence(
+        if self.isPi:
+            self.camera.capture_sequence(
                                     self._streams(), 
                                     use_video_port  =   True, 
                                     format          =   'rgb',
                                     resize          =   self.imgSize)
+        else:
+            print("GET")
+            self._streams()
         # record mode
         if self.recordMode:
             self.camera.stop_recording()
@@ -82,25 +88,28 @@ class CameraThread(ThreadWithStop):
     def _init_camera(self):
         """Init the PiCamera and its parameters
         """
-        
-        # this how the firmware works.
-        # the camera has to be imported here
-        from picamera import PiCamera
+        if self.isPi:
+            # this how the firmware works.
+            # the camera has to be imported here
+            from picamera import PiCamera
 
-        # camera
-        self.camera = PiCamera()
+            # camera
+            self.camera = PiCamera()
 
-        # camera settings
-        self.camera.resolution      =   (1640,1232)
-        self.camera.framerate       =   15
+            # camera settings
+            self.camera.resolution      =   (1640,1232)
+            self.camera.framerate       =   15
 
-        self.camera.brightness      =   50
-        self.camera.shutter_speed   =   1200
-        self.camera.contrast        =   0
-        self.camera.iso             =   0 # auto
-        
+            self.camera.brightness      =   50
+            self.camera.shutter_speed   =   1200
+            self.camera.contrast        =   0
+            self.camera.iso             =   0 # auto
+            
 
-        self.imgSize                =   (640, 480)    # the actual image size
+            self.imgSize                =   (640, 480)    # the actual image size
+        else:
+            import cv2
+            self.camera = cv2.VideoCapture(0)
 
     # ===================================== GET STAMP ====================================
     def _get_timestamp(self):
@@ -118,23 +127,32 @@ class CameraThread(ThreadWithStop):
         """
 
         while self._running:
-            
-            yield self._stream
-            self._stream.seek(0)
-            data = self._stream.read()
+            if self.isPi:
+                
+                yield self._stream
+                self._stream.seek(0)
+                data = self._stream.read()
 
-            # read and reshape from bytes to np.array
-            data  = np.frombuffer(data, dtype=np.uint8)
-            data  = np.reshape(data, (480, 640, 3))
-            stamp = time.time()
+                # read and reshape from bytes to np.array
+                data  = np.frombuffer(data, dtype=np.uint8)
+                data  = np.reshape(data, (480, 640, 3))
+                stamp = time.time()
 
-            # output image and time stamp
-            # Note: The sending process can be blocked, when doesn't exist any consumer process and it reaches the limit size.
-            for outP in self.outPs:
-                outP.send([[stamp], data])
+                # output image and time stamp
+                # Note: The sending process can be blocked, when doesn't exist any consumer process and it reaches the limit size.
+                for outP in self.outPs:
+                    outP.send([[stamp], data])
 
-            
-            self._stream.seek(0)
-            self._stream.truncate()
-
+                
+                self._stream.seek(0)
+                self._stream.truncate()
+            else:
+                _, data = self.camera.read()
+                data  = np.reshape(data, (480, 640, 3))
+                stamp = time.time()
+                print(data)
+                # output image and time stamp
+                # Note: The sending process can be blocked, when doesn't exist any consumer process and it reaches the limit size.
+                for outP in self.outPs:
+                    outP.send([[stamp], data])
 
