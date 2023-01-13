@@ -36,6 +36,9 @@ import time
 import signal
 from multiprocessing import Pipe, Process, Event 
 
+# car imports
+from src.car.CarControlProcess                                     import CarControl
+
 # hardware imports
 from src.hardware.camera.cameraprocess                      import CameraProcess
 from src.hardware.camera.CameraSpooferProcess               import CameraSpooferProcess
@@ -92,7 +95,8 @@ if enableRc:
     print(rcShR)
     allProcesses.append(shProc)
 
-    rcProc = RemoteControlReceiverProcess([],[rcShS])
+    #rcProc = RemoteControlReceiverProcess([],[rcShS])
+    rcProc = CarControlProcess([],[rcShS])
     allProcesses.append(rcProc)
 
 # =============================== DETECTION =================================================

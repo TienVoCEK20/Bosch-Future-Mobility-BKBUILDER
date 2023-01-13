@@ -129,7 +129,8 @@ class RemoteControlTransmitterProcess(Thread):
                 }  
         command = json.dumps(_speed).encode()
         print(command) 
-        self.client_socket.sendto(command,(self.serverIp,self.port))      
+        self.client_socket.sendto(command,(self.serverIp,self.port))
+        
     def goForward(self, distance, speed):
         _distance = {
                     "action": "7",
@@ -139,6 +140,7 @@ class RemoteControlTransmitterProcess(Thread):
         command = json.dumps(_distance).encode()
         print(command) 
         self.client_socket.sendto(command,(self.serverIp,self.port))
+        
     def steerAngle(self, steerAngle):
         _distance = {
                     "action": "2",
@@ -147,6 +149,7 @@ class RemoteControlTransmitterProcess(Thread):
         command = json.dumps(_distance).encode()
         print(command) 
         self.client_socket.sendto(command,(self.serverIp,self.port))
+        
     def brake(self, break_steerAngle):
         _brake = {  
                 "action": "3",
