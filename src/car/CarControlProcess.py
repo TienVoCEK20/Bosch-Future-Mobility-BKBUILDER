@@ -23,18 +23,33 @@ class CarControl(WorkerProcess):
 
         super(CarControl,self).__init__( inPs, outPs)
         self.control = outPs
+        #print(self.control[0])
+        self.activate = 1
         
         self.error_arr = np.zeros(5)
         self.time_pid = time.time()
-    
+    # ===================================== RUN ==========================================
+    def run(self):
+        """Apply the initializing methods and start the threads
+        """
+        super(CarControl,self).run()
+    def activatePID(self):
+        _activate_pid = {
+                    "action": "4",
+                    "activate": True
+                }
+        command = _activate_pid
+        print(command) 
+        self.control[0].send(command)
+
     def keepGoing(self, speed):
         _speed =    {
                     "action": "1",
                     "speed": float(speed)
                 }  
-        command = json.dumps(_speed).encode()
+        command = json.loads(_speed)
         print(command) 
-        self.control.send(command)
+        self.control[0].send(command)
         
     def goForward(self, distance, speed):
         _distance = {
@@ -42,18 +57,18 @@ class CarControl(WorkerProcess):
                     "distance": float(distance),
                     "speed": float(speed)
                 }
-        command = json.dumps(_distance).encode()
+        command = _distance
         print(command) 
-        self.control.send(command)
+        self.control[0].send(command)
         
     def steerAngle(self, steerAngle):
         _distance = {
                     "action": "2",
                     "steerAngle": float(steerAngle)
                 }
-        command = json.dumps(_distance).encode()
+        command = json.loads(_distance)
         print(command) 
-        self.control.send(command)
+        self.control[0].send(command)
        
     ''' Based on Mr. Ngo Duc Tuan's DR2020 code ''' 
     def steerPID(self, x, y):
@@ -132,8 +147,32 @@ class CarControl(WorkerProcess):
                 "action": "3",
                 "brake (steerAngle)": float(break_steerAngle)
             }
-        command = json.dumps(_brake).encode()
+        command = json.loads(_brake)
         print(command) 
-        self.control.send(command)
+        self.control[0].send(command)
+ # ===================================== INIT THREADS =================================
+    def _init_threads(self):
+        """Initialize the read thread to transmite the received messages to other processes. 
+        """
+        readTh = Thread(name='ReceiverCommandThread',target = self._read_stream, args = (self.outPs, ))
+        self.threads.append(readTh)
 
+    # ===================================== READ STREAM ==================================
+    def _read_stream(self, outPs):
+        """Receive the message and forwards them to the SerialHandlerProcess. 
         
+        Parameters
+        ----------
+        outPs : list(Pipe)
+            List of the output pipes.
+        """
+        try:
+            while True:
+                #print("hello")
+                if self.activate: 
+                    self.activate = 0
+                    self.activatePID()
+                    self.goForward(1,0.09)
+
+        except Exception as e:
+            print(e)

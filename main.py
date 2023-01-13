@@ -37,8 +37,7 @@ import signal
 from multiprocessing import Pipe, Process, Event 
 
 # car imports
-from src.car.CarControlProcess                                     import CarControl
-
+from src.car.CarControlProcess                              import CarControl
 # hardware imports
 from src.hardware.camera.cameraprocess                      import CameraProcess
 from src.hardware.camera.CameraSpooferProcess               import CameraSpooferProcess
@@ -54,7 +53,7 @@ from src.utils.remotecontrol.RemoteControlReceiverProcess   import RemoteControl
 # =============================== CONFIG =================================================
 enableStream        =  True
 enableCameraSpoof   =  False 
-enableRc            =  False
+enableRc            =  True
 
 # =============================== INITIALIZING PROCESSES =================================
 allProcesses = list()
@@ -92,11 +91,11 @@ if enableRc:
     rcShR, rcShS   = Pipe(duplex = False)           # rc      ->  serial handler
     # serial handler process
     shProc = SerialHandlerProcess([rcShR], [])
-    print(rcShR)
+    #print(rcShR)
     allProcesses.append(shProc)
-
+    #print(rcShR)
     #rcProc = RemoteControlReceiverProcess([],[rcShS])
-    rcProc = CarControlProcess([],[rcShS])
+    rcProc = CarControl([],[rcShS])
     allProcesses.append(rcProc)
 
 # =============================== DETECTION =================================================
@@ -109,6 +108,7 @@ print("Starting the processes!",allProcesses)
 for proc in allProcesses:
     proc.daemon = True
     proc.start()
+
 
 
 # ===================================== STAYING ALIVE ====================================
