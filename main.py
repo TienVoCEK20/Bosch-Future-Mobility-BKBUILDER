@@ -84,7 +84,7 @@ if enableStream:
 # LocSysProc = LocalisationSystemProcess([], [LocStS])
 # allProcesses.append(LocSysProc)
 
-
+global car
 
 # =============================== CONTROL =================================================
 if enableRc:
@@ -96,11 +96,13 @@ if enableRc:
     #print(rcShR)
     #rcProc = RemoteControlReceiverProcess([],[rcShS])
     rcProc = CarControl([],[rcShS])
+    car = rcProc
     allProcesses.append(rcProc)
 
 # =============================== DETECTION =================================================
-    
 
+car.activatePID()    
+car.keepGoing(0.02)
 
 
 # ===================================== START PROCESSES ==================================

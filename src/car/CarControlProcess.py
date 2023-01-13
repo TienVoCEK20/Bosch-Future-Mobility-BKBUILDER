@@ -29,10 +29,10 @@ class CarControl(WorkerProcess):
         self.error_arr = np.zeros(5)
         self.time_pid = time.time()
     # ===================================== RUN ==========================================
-    def run(self):
-        """Apply the initializing methods and start the threads
-        """
-        super(CarControl,self).run()
+    # def run(self):
+    #     """Apply the initializing methods and start the threads
+    #     """
+    #     super(CarControl,self).run()
     def activatePID(self):
         _activate_pid = {
                     "action": "4",
@@ -150,29 +150,29 @@ class CarControl(WorkerProcess):
         command = json.loads(_brake)
         print(command) 
         self.control[0].send(command)
- # ===================================== INIT THREADS =================================
-    def _init_threads(self):
-        """Initialize the read thread to transmite the received messages to other processes. 
-        """
-        readTh = Thread(name='ReceiverCommandThread',target = self._read_stream, args = (self.outPs, ))
-        self.threads.append(readTh)
+#  # ===================================== INIT THREADS =================================
+#     def _init_threads(self):
+#         """Initialize the read thread to transmite the received messages to other processes. 
+#         """
+#         readTh = Thread(name='ReceiverCommandThread',target = self._read_stream, args = (self.outPs, ))
+#         self.threads.append(readTh)
 
-    # ===================================== READ STREAM ==================================
-    def _read_stream(self, outPs):
-        """Receive the message and forwards them to the SerialHandlerProcess. 
+#     # ===================================== READ STREAM ==================================
+#     def _read_stream(self, outPs):
+#         """Receive the message and forwards them to the SerialHandlerProcess. 
         
-        Parameters
-        ----------
-        outPs : list(Pipe)
-            List of the output pipes.
-        """
-        try:
-            while True:
-                #print("hello")
-                if self.activate: 
-                    self.activate = 0
-                    self.activatePID()
-                    self.goForward(1,0.09)
+#         Parameters
+#         ----------
+#         outPs : list(Pipe)
+#             List of the output pipes.
+#         """
+#         try:
+#             while True:
+#                 #print("hello")
+#                 if self.activate: 
+#                     self.activate = 0
+#                     self.activatePID()
+#                     self.goForward(1,0.09)
 
-        except Exception as e:
-            print(e)
+#         except Exception as e:
+#             print(e)
