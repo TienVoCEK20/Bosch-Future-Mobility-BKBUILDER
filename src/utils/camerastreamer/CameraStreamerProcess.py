@@ -75,7 +75,7 @@ class CameraStreamerProcess(WorkerProcess):
     def _init_socket(self):
         """Initialize the socket client. 
         """
-        self.serverIp   =  '192.168.0.104' # PC ip
+        self.serverIp   =  '192.168.1.8' # PC ip
         self.port       =  2244            # com port
 
         self.client_socket = socket.socket()
@@ -110,7 +110,7 @@ class CameraStreamerProcess(WorkerProcess):
         print("RAN")
         while True:
             try:
-                print("RECEIVED")
+                #print("RECEIVED")
                 stamps, image = inP.recv()
                  
                 result, image = cv2.imencode('.jpg', image, encode_param)

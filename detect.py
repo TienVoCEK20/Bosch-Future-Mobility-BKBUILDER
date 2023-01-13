@@ -15,7 +15,7 @@ import yaml
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-from edgetpumodel import *
+from src.utils.detection.edgetpumodel import * 
 
 # from edgetpumodel import EdgeTPUModel
 # from utils import resize_and_pad, get_image_tensor, save_one_json, coco80_to_coco91_class
@@ -85,7 +85,7 @@ def run(model, quiet=False, stream=True, image_t=None, bench_speed=False, bench_
         while True:
           try:
             res, image = cam.read()
-            
+            print(image.shape)
             if res is False:
                 logger.error("Empty image received")
                 break
@@ -103,8 +103,8 @@ def run(model, quiet=False, stream=True, image_t=None, bench_speed=False, bench_
         cam.release()
 
 if __name__ == "__main__":
-    model_path = "weights/traffic.tflite"
-    names = "data.yaml"
+    model_path = "src/utils/detection/weights/traffic.tflite"
+    names = "src/utils/detection/data.yaml"
     conf_thresh = 0.5
     iou_thresh = 0.65
     device = 0

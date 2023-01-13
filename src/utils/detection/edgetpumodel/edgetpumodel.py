@@ -7,11 +7,11 @@ import yaml
 import numpy as np
 import pycoral.utils.edgetpu as etpu
 from pycoral.adapters import common
-from edgetpumodel.nms import non_max_suppression
+from src.utils.detection.edgetpumodel.nms import non_max_suppression
 import cv2
 import json
 
-from utils import plot_one_box, Colors, get_image_tensor
+from src.utils.detection.edgetpumodel.utils import plot_one_box, Colors, get_image_tensor
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("EdgeTPUModel")
@@ -223,7 +223,7 @@ class EdgeTPUModel:
         
         return np.array(out).astype(int)
 
-    def process_predictions(self, det, output_image, pad, output_path="detection.jpg", save_img=True, save_txt=True, hide_labels=False, hide_conf=False):
+    def process_predictions(self, det, output_image, pad, output_path="detection.jpg", save_img=False, save_txt=False, hide_labels=False, hide_conf=False):
         """
         Process predictions and optionally output an image with annotations
         """
@@ -245,10 +245,12 @@ class EdgeTPUModel:
                 s = s.strip()
                 s = s[:-1]
             
-            logger.info("Detected: {}".format(s))
+            #logger.info("Detected: {}".format(s))
             
             # Write results
             for *xyxy, conf, cls in reversed(det):
+                c = int(cls)
+                print(f'{self.names[c]} {conf:.2f} {xyxy}')
                 if save_img:  # Add bbox to image
                     c = int(cls)  # integer class
                     label = None if hide_labels else (self.names[c] if hide_conf else f'{self.names[c]} {conf:.2f}')

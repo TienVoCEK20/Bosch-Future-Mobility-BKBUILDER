@@ -58,7 +58,7 @@ class CameraThread(ThreadWithStop):
         self.outPs        =   outPs
 
         #is PiCam or Webcam
-        self.isPi = False #default
+        self.isPi = True #default
     #================================ RUN ================================================
     def run(self):
         """Apply the initializing methods and start the thread. 
@@ -100,7 +100,7 @@ class CameraThread(ThreadWithStop):
             self.camera.resolution      =   (1640,1232)
             self.camera.framerate       =   15
 
-            self.camera.brightness      =   50
+            self.camera.brightness      =   80
             self.camera.shutter_speed   =   1200
             self.camera.contrast        =   0
             self.camera.iso             =   0 # auto
@@ -138,7 +138,7 @@ class CameraThread(ThreadWithStop):
 
         while self._running:
             if self.isPi:
-                
+                #print("SENDING_PI")
                 yield self._stream
                 self._stream.seek(0)
                 data = self._stream.read()
@@ -157,8 +157,9 @@ class CameraThread(ThreadWithStop):
                 self._stream.seek(0)
                 self._stream.truncate()
             else:
+                print("SENDING_WEBCAM")
+                # self.print_frame()
                 _, data = self.camera.read()
-                data  = np.reshape(data, (480, 640, 3))
                 stamp = time.time()
                 print(data)
                 # output image and time stamp

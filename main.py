@@ -45,26 +45,32 @@ from src.hardware.serialhandler.SerialHandlerProcess        import SerialHandler
 from src.utils.camerastreamer.CameraStreamerProcess         import CameraStreamerProcess
 from src.utils.remotecontrol.RemoteControlReceiverProcess   import RemoteControlReceiverProcess
 
+# detection imports
+#from src.utils.detection.DetectionProcess                   import DetectionProcess
+
 # =============================== CONFIG =================================================
 enableStream        =  True
 enableCameraSpoof   =  False 
-enableRc            =  True
+enableRc            =  False
 
 # =============================== INITIALIZING PROCESSES =================================
 allProcesses = list()
 
 # =============================== HARDWARE ===============================================
 if enableStream:
-    camStR, camStS = Pipe(duplex = False)           # camera  ->  streamer
-
+    camStR, camStS = Pipe(duplex = True)           # camera  ->  streamer
+    camDtR, camDtS = Pipe(duplex= False)
     if enableCameraSpoof:
         camSpoofer = CameraSpooferProcess([],[camStS],'vid')
         allProcesses.append(camSpoofer)
 
     else:
-        camProc = CameraProcess([],[camStS])
+        camProc = CameraProcess([],[camStS, camDtS])
         allProcesses.append(camProc)
-
+    #DETECTION
+    #detectionProc = DetectionProcess([camDtR], [])
+    #allProcesses.append(detectionProc)
+    #STREAM
     streamProc = CameraStreamerProcess([camStR], [])
     allProcesses.append(streamProc)
 
@@ -81,7 +87,6 @@ if enableStream:
 # =============================== CONTROL =================================================
 if enableRc:
     rcShR, rcShS   = Pipe(duplex = False)           # rc      ->  serial handler
-
     # serial handler process
     shProc = SerialHandlerProcess([rcShR], [])
     print(rcShR)
@@ -89,6 +94,10 @@ if enableRc:
 
     rcProc = RemoteControlReceiverProcess([],[rcShS])
     allProcesses.append(rcProc)
+
+# =============================== DETECTION =================================================
+    
+
 
 
 # ===================================== START PROCESSES ==================================
