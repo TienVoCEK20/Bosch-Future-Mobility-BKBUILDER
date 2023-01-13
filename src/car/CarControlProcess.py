@@ -99,7 +99,33 @@ class CarControl(WorkerProcess):
             if abs(steer) > 60:
                 steer = np.sign(steer) * 60
         return int(steer)
-            
+    
+    ''' Compute steering angle based on Vu Thanh Dat's DR2020 code '''
+    def angleCalculator(self, x, y):
+        slope = (x - 72) / float(y - 144) # (320, 360) is center of (640, 360) image
+        angleRadian = float(math.atan(slope))
+        angleDegree = float(angleRadian * 180.0 / math.pi)
+        return angleDegree
+    
+    def computeCenter(self, roadImg):
+        count = 0
+        center_x = 0
+        center_y = 0 
+        
+        for i in range(0,144):
+            for j in range(0,144):
+                if roadImg[i][j] == 255:
+                    count += 1
+                    center_x += i
+                    center_y += j
+    
+
+        if center_x != 0 or center_y != 0 or count != 0:
+            center_x = center_x / count
+            center_x = center_y / count
+            angleDegree = self.angleCalculator(center_x, center_y) # Call angle_calculator method in speed_up.py to use numba function
+
+        return angleDegree
         
     def brake(self, break_steerAngle):
         _brake = {  
