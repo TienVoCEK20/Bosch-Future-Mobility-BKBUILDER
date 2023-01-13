@@ -101,8 +101,13 @@ if enableRc:
 
 # =============================== DETECTION =================================================
 
-car.activatePID()    
-car.keepGoing(0.02)
+car.activatePID()
+print(car.isPIDActive() + "\n") 
+car.updateSpeed(0.09)
+print(car.getCurrentSpeed() + "\n")
+car.goForward(2, 0.2)
+car.activatePID(False)
+print(car.isPIDActive() + "\n") 
 
 
 # ===================================== START PROCESSES ==================================

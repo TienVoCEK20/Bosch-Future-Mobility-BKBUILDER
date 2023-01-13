@@ -28,47 +28,58 @@ class CarControl(WorkerProcess):
         
         self.error_arr = np.zeros(5)
         self.time_pid = time.time()
+        
+        self.current_speed = 0
+        self.pid_active = False
     # ===================================== RUN ==========================================
     # def run(self):
     #     """Apply the initializing methods and start the threads
     #     """
     #     super(CarControl,self).run()
-    def activatePID(self):
-        _activate_pid = {
+    def activatePID(self, activate = True):
+        self.pid_active = activate
+        _activate= {
                     "action": "4",
-                    "activate": True
+                    "activate": self.pid_active
                 }
-        command = _activate_pid
-        print(command) 
-        self.control[0].send(command)
+        print(_activate) 
+        self.control[0].send(_activate)
+        
+    def isPIDActive(self):
+        return self.pid_active
 
-    def keepGoing(self, speed):
+    def updateSpeed(self, speed):
+        self.current_speed = speed
         _speed =    {
                     "action": "1",
-                    "speed": float(speed)
+                    "speed": float(self.current_speed)
                 }  
-        command = json.loads(_speed)
-        print(command) 
-        self.control[0].send(command)
+        print(_speed) 
+        self.control[0].send(_speed)
+        
+    def adjustSpeed(self, value):
+       self.updateSpeed(self.current_speed + value)
+       
+    def getCurrentSpeed(self):
+        return self.current_speed
         
     def goForward(self, distance, speed):
+        self.current_speed = speed
         _distance = {
                     "action": "7",
                     "distance": float(distance),
-                    "speed": float(speed)
+                    "speed": float(self.current_speed)
                 }
-        command = _distance
-        print(command) 
-        self.control[0].send(command)
+        print(_distance) 
+        self.control[0].send(_distance)
         
     def steerAngle(self, steerAngle):
-        _distance = {
+        _steer = {
                     "action": "2",
                     "steerAngle": float(steerAngle)
                 }
-        command = json.loads(_distance)
-        print(command) 
-        self.control[0].send(command)
+        print(_steer) 
+        self.control[0].send(_steer)
        
     ''' Based on Mr. Ngo Duc Tuan's DR2020 code ''' 
     def steerPID(self, x, y):
