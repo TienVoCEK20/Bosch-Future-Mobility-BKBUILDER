@@ -37,7 +37,7 @@ import signal
 from multiprocessing import Pipe, Process, Event 
 
 # car imports
-from src.car.CarControl                                     import CarControlProcess
+from src.car.CarControlProcess                                     import CarControl
 
 # hardware imports
 from src.hardware.camera.cameraprocess                      import CameraProcess
