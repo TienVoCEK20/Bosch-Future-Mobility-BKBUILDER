@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 import pickle
-from numba import float32, uint16
+# from numba import float32, uint16
 
 ##################  TEST CONFIG #################################
 VIDEO_PATH = 'D:\Bosch-Future-Mobility-BKBUILDER\lane_detection\\video\\bosch_test_3.mp4' 
@@ -15,17 +15,17 @@ IMG_SIZE  = [640, 360]
 
 ################    NUMBA-JIT CONFIG    #########################
 
-SPEC_PROCESSOR = [
-    ('gaussian_kernel_size', uint16),
-    ('sobel_kernel_size', uint16),
-    ('lower_white', uint16[:]),
-    ('upper_white', uint16[:]),
-]
+# SPEC_PROCESSOR = [
+#     ('gaussian_kernel_size', uint16),
+#     ('sobel_kernel_size', uint16),
+#     ('lower_white', uint16[:]),
+#     ('upper_white', uint16[:]),
+# ]
 
-SPEC_LANEDETECTION = [
-    ('ym_per_pix', float32),
-    ('xm_per_pix', float32)
-]
+# SPEC_LANEDETECTION = [
+#     ('ym_per_pix', float32),
+#     ('xm_per_pix', float32)
+# ]
 
 ################### END JIT CONFIG  ##############################
 

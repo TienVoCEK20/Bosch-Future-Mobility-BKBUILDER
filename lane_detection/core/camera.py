@@ -1,8 +1,8 @@
 import cv2 as cv
 import numpy as np
-import matplotlib.pyplot as plt
-from utils import SAVE_DIR, IMG_DIR, save_pkl, load_pkl
-from laneDetection import LaneDetection
+# import matplotlib.pyplot as plt
+from .utils import SAVE_DIR, IMG_DIR, save_pkl, load_pkl
+from .laneDetection import LaneDetection
 from collections import deque
 
 class Lane:

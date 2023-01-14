@@ -1,5 +1,5 @@
 import numpy as np
-from camera import Camera
+from .camera import Camera
 from threading import Thread
 
 from src.templates.workerprocess import WorkerProcess

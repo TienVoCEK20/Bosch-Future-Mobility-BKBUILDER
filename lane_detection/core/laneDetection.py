@@ -1,9 +1,9 @@
 import cv2 as cv
 import numpy as np
-import matplotlib.pyplot as plt
-from utils import Trackbars, SPEC_PROCESSOR, SPEC_LANEDETECTION
-from numba import *
-from numba.experimental import jitclass
+# import matplotlib.pyplot as plt
+from .utils import Trackbars
+# from numba import *
+# from numba.experimental import jitclass
 
 # @jitclass(SPEC_PROCESSOR)
 class Preprocessor:

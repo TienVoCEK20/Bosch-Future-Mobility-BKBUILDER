@@ -74,7 +74,7 @@ if enableStream:
         allProcesses.append(camProc)
     
     #   LANE DETECTION
-    laneDetectionProc = LaneDetectionProcess([camStR])
+    laneDetectionProc = LaneDetectionProcess([camStR], [])
     allProcesses.append(laneDetectionProc)
 
     #   DETECTION
@@ -124,16 +124,16 @@ for proc in allProcesses:
     proc.daemon = True
     proc.start()
 
-# count = 0
-# car.activatePID()
-# print(car.isPIDActive()) 
-# car.updateSpeed(0.09)
-# time.sleep(1)
-# while car.getCurrentSpeed() < 0.2:
-#     car.adjustSpeed(0.01)
-#     print(car.getCurrentSpeed())
-#     time.sleep(0.5)
-# car.brake(0)
+count = 0
+car.activatePID()
+print(car.isPIDActive()) 
+car.updateSpeed(0.09)
+time.sleep(1)
+while car.getCurrentSpeed() < 0.2:
+    car.adjustSpeed(0.01)
+    print(car.getCurrentSpeed())
+    time.sleep(0.5)
+car.brake(0)
 
 # ===================================== STAYING ALIVE ====================================
 blocker = Event()  
