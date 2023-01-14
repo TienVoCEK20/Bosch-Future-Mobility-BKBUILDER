@@ -25,31 +25,35 @@ if __name__ == '__main__':
 
     preprocessor = Preprocessor()
     video = cv.VideoCapture(VIDEO_PATH)
+    video.set(cv.CAP_PROP_FPS, 10)
     camera = Camera()
     camera.load_calibrate_info(CALIBRATE_PICKLE)
     
 
-    while True:
+    while (video.isOpened()):
         try:
             flag, frame = video.read()
-            frame = cv.resize(frame, IMG_SIZE)
-            calibrate_img = camera.undistort(frame)
-            output1 = camera.laneDetector.processor.process(calibrate_img)
-            output = camera.detectLane(calibrate_img)
+            if flag:
+                frame = cv.resize(frame, IMG_SIZE)
+                calibrate_img = camera.undistort(frame)
+                detection_img= camera._runDetectLane(calibrate_img)
 
-            
-
-
-            # plt.imshow(frame, cmap= 'gray')
-            # plt.show()
-            # print(output1['birdeye'])
-            output = draw_points(output, output1['birdeye']['src'])
-            # cv.imshow('points', points)
-            cv.imshow("Frame", output1['thresh'])
-            cv.imshow("Lane detection", output) 
-            cv.waitKey(1)
-        
+                ######################### TESTING   #########################
+                output = camera.laneDetector.processor.process(calibrate_img)
+                thresh = output['thresh']
+                points_img = draw_points(frame, output['birdeye']['src'])
+                
+                # cv.imshow('points', points_img)
+                cv.imshow('Thresh', thresh)
+                cv.imshow('Detection', detection_img)
+                #############################################################
+                # cv.imshow('Main', output['birdeye']['birdeye'])
+                cv.waitKey(1)
         except Exception as e:
             print(e)
+    
+    
+    video.release()
+    cv.destroyAllWindows()
    
 

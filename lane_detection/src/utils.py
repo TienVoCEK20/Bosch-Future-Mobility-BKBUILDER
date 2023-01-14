@@ -4,11 +4,12 @@ import pickle
 from numba import float32, uint16
 
 ##################  TEST CONFIG #################################
-VIDEO_PATH = 'lane_detection\video\video_test.mp4video_test.mp4'
-IMG_DIR = 'test_images'
-SAVE_DIR = 'src\save'
-CAL_IMG_DIR =  'calibrate_imgs'
-CALIBRATE_PICKLE = 'D:\BOSCH\src\save\calibration.pkl'
+VIDEO_PATH = 'D:\Bosch-Future-Mobility-BKBUILDER\lane_detection\\video\\bosch_test_3.mp4' 
+# VIDEO_PATH = 'D:\Bosch-Future-Mobility-BKBUILDER\lane_detection\\video\project_video.mp4'
+IMG_DIR = 'D:\Bosch-Future-Mobility-BKBUILDER\lane_detection\test_images'
+SAVE_DIR = 'D:\Bosch-Future-Mobility-BKBUILDER\lane_detection\src\save' 
+CAL_IMG_DIR =  'D:\Bosch-Future-Mobility-BKBUILDER\lane_detection\calibrate_imgs'
+CALIBRATE_PICKLE = 'D:\Bosch-Future-Mobility-BKBUILDER\lane_detection\src\save\calibration.pkl'
 IMG_SIZE  = [640, 360]
 #####################   END TEST CONFIG  ########################
 
