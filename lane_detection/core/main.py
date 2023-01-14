@@ -44,8 +44,8 @@ if __name__ == '__main__':
                 points_img = draw_points(frame, output['birdeye']['src'])
                 
                 # cv.imshow('points', points_img)
-                cv.imshow('Thresh', thresh)
-                cv.imshow('Detection', detection_img)
+                # cv.imshow('Thresh', thresh)
+                # cv.imshow('Detection', detection_img)
                 #############################################################
                 # cv.imshow('Main', output['birdeye']['birdeye'])
                 cv.waitKey(1)

@@ -46,7 +46,7 @@ from src.hardware.serialhandler.SerialHandlerProcess        import SerialHandler
 # utility imports
 from src.utils.camerastreamer.CameraStreamerProcess         import CameraStreamerProcess
 from src.utils.remotecontrol.RemoteControlReceiverProcess   import RemoteControlReceiverProcess
-from lane_detection.core import LaneDetectionProcess
+from lane_detection.core.LaneDetectionProcess import LaneDetectionProcess
 # detection imports
 from src.utils.detection.DetectionProcess                   import DetectionProcess
 
@@ -55,8 +55,8 @@ from src.utils.server.ServerReceiverProcess                 import ServerReceive
 # =============================== CONFIG =================================================
 enableStream        =  True
 enableCameraSpoof   =  True 
-enableRc            =  False
-enableServer        =  True
+enableRc            =  True
+enableServer        =  False
 # =============================== INITIALIZING PROCESSES =================================
 allProcesses = list()
 
@@ -74,9 +74,9 @@ if enableStream:
         allProcesses.append(camProc)
     
     #   LANE DETECTION
-    laneDetectionProc = LaneDetectionProcess([camStR], [])
+    laneDetectionProc = LaneDetectionProcess([camStR], [camDtLS])
     allProcesses.append(laneDetectionProc)
-
+    
     #   DETECTION
     detectionProc = DetectionProcess([camStR], [camDtS])
     allProcesses.append(detectionProc)
@@ -123,6 +123,8 @@ print("Starting the processes!",allProcesses)
 for proc in allProcesses:
     proc.daemon = True
     proc.start()
+
+print(laneDetectionProc._image_process_results_return())
 
 count = 0
 car.activatePID()

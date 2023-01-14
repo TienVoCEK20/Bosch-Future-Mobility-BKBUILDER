@@ -22,6 +22,8 @@ class CarControl(WorkerProcess):
         """
 
         super(CarControl,self).__init__( inPs, outPs)
+        self.lane_result = inPs[0]
+        self.object_result = inPs[1]
         self.control = outPs
         #print(self.control[0])
         self.activate = 1

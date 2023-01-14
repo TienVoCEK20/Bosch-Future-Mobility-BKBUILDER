@@ -11,6 +11,8 @@ SAVE_DIR = 'D:\Bosch-Future-Mobility-BKBUILDER\lane_detection\core\save'
 CAL_IMG_DIR =  'D:\Bosch-Future-Mobility-BKBUILDER\lane_detection\calibrate_imgs'
 CALIBRATE_PICKLE = 'D:\Bosch-Future-Mobility-BKBUILDER\lane_detection\src\save\calibration.pkl'
 IMG_SIZE  = [640, 360]
+
+global image_processing_results
 #####################   END TEST CONFIG  ########################
 
 ################    NUMBA-JIT CONFIG    #########################
@@ -67,8 +69,8 @@ def load_pkl(pickle_file):
 class Trackbars:
 
     def __init__(self):
-       
-        self.initPointTrackings([100, 100, 100, 100])
+        pass
+        #self.initPointTrackings([100, 100, 100, 100])
 
     def initPointTrackings(self, initVals, width = IMG_SIZE[1], height = IMG_SIZE[0]):
         """
