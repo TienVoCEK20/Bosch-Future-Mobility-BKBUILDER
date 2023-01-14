@@ -46,7 +46,7 @@ from src.hardware.serialhandler.SerialHandlerProcess        import SerialHandler
 # utility imports
 from src.utils.camerastreamer.CameraStreamerProcess         import CameraStreamerProcess
 from src.utils.remotecontrol.RemoteControlReceiverProcess   import RemoteControlReceiverProcess
-
+from lane_detection.core import LaneDetectionProcess
 # detection imports
 from src.utils.detection.DetectionProcess                   import DetectionProcess
 
@@ -64,6 +64,7 @@ allProcesses = list()
 if enableStream:
     camStR, camStS = Pipe(duplex = True)           # camera  ->  streamer
     camDtR, camDtS = Pipe(duplex= False)
+    # camDtLR, camDtLS = Pipe(duplex=False)
     if enableCameraSpoof:
         camSpoofer = CameraSpooferProcess([],[camStS],videoDir='/home/pi/Bosch-Future-Mobility-BKBUILDER/testvideo/',ext='.avi')
         allProcesses.append(camSpoofer)
@@ -71,7 +72,12 @@ if enableStream:
     else:
         camProc = CameraProcess([],[camStS])
         allProcesses.append(camProc)
-    #DETECTION
+    
+    #   LANE DETECTION
+    laneDetectionProc = LaneDetectionProcess([camStR])
+    allProcesses.append(laneDetectionProc)
+
+    #   DETECTION
     detectionProc = DetectionProcess([camStR], [camDtS])
     allProcesses.append(detectionProc)
     #STREAM
