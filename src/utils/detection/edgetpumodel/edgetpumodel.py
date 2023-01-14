@@ -249,8 +249,8 @@ class EdgeTPUModel:
             
             # Write results
             for *xyxy, conf, cls in reversed(det):
-                c = int(cls)
-                print(f'{self.names[c]} {conf:.2f} {xyxy}')
+                #c = int(cls)
+                #print(f'{self.names[c]} {conf:.2f} {xyxy}')
                 if save_img:  # Add bbox to image
                     c = int(cls)  # integer class
                     label = None if hide_labels else (self.names[c] if hide_conf else f'{self.names[c]} {conf:.2f}')

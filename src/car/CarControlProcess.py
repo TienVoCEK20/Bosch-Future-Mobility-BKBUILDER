@@ -158,9 +158,8 @@ class CarControl(WorkerProcess):
                 "action": "3",
                 "brake (steerAngle)": float(break_steerAngle)
             }
-        command = json.loads(_brake)
-        print(command) 
-        self.control[0].send(command)
+        print(_brake) 
+        self.control[0].send(_brake)
 #  # ===================================== INIT THREADS =================================
 #     def _init_threads(self):
 #         """Initialize the read thread to transmite the received messages to other processes. 

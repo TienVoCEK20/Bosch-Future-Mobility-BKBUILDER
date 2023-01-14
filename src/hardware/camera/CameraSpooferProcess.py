@@ -55,7 +55,7 @@ class CameraSpooferProcess(WorkerProcess):
         super(CameraSpooferProcess,self).__init__(inPs,outPs)
 
         # params
-        self.videoSize = (640,480)
+        self.videoSize = (640,360)
         
         self.videoDir = videoDir
         self.videos = self.open_files(self.videoDir, ext = ext)

@@ -106,7 +106,7 @@ class CameraThread(ThreadWithStop):
             self.camera.iso             =   0 # auto
             
 
-            self.imgSize                =   (640, 480)    # the actual image size
+            self.imgSize                =   (640, 360)    # the actual image size
         else:
             import cv2
             self.camera = cv2.VideoCapture(0)
@@ -153,7 +153,6 @@ class CameraThread(ThreadWithStop):
                 for outP in self.outPs:
                     outP.send([[stamp], data])
 
-                
                 self._stream.seek(0)
                 self._stream.truncate()
             else:

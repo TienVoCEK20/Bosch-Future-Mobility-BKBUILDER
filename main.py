@@ -48,13 +48,15 @@ from src.utils.camerastreamer.CameraStreamerProcess         import CameraStreame
 from src.utils.remotecontrol.RemoteControlReceiverProcess   import RemoteControlReceiverProcess
 
 # detection imports
-#from src.utils.detection.DetectionProcess                   import DetectionProcess
+from src.utils.detection.DetectionProcess                   import DetectionProcess
 
+#server imports
+from src.utils.server.ServerReceiverProcess                 import ServerReceiverProcess
 # =============================== CONFIG =================================================
 enableStream        =  True
-enableCameraSpoof   =  False 
-enableRc            =  True
-
+enableCameraSpoof   =  True 
+enableRc            =  False
+enableServer        =  True
 # =============================== INITIALIZING PROCESSES =================================
 allProcesses = list()
 
@@ -63,18 +65,24 @@ if enableStream:
     camStR, camStS = Pipe(duplex = True)           # camera  ->  streamer
     camDtR, camDtS = Pipe(duplex= False)
     if enableCameraSpoof:
-        camSpoofer = CameraSpooferProcess([],[camStS],'vid')
+        camSpoofer = CameraSpooferProcess([],[camStS],videoDir='/home/pi/Bosch-Future-Mobility-BKBUILDER/testvideo/',ext='.avi')
         allProcesses.append(camSpoofer)
 
     else:
-        camProc = CameraProcess([],[camStS, camDtS])
+        camProc = CameraProcess([],[camStS])
         allProcesses.append(camProc)
     #DETECTION
-    #detectionProc = DetectionProcess([camDtR], [])
-    #allProcesses.append(detectionProc)
+    detectionProc = DetectionProcess([camStR], [camDtS])
+    allProcesses.append(detectionProc)
     #STREAM
-    streamProc = CameraStreamerProcess([camStR], [])
+    streamProc = CameraStreamerProcess([camDtR], [])
     allProcesses.append(streamProc)
+
+# =============================== SERVER ===================================================
+if enableServer:
+    SerStR, SerStS = Pipe(duplex = False)
+    serverProc = ServerReceiverProcess([SerStR], [SerStS])
+    allProcesses.append(serverProc)
 
 
 # =============================== DATA ===================================================
@@ -101,13 +109,7 @@ if enableRc:
 
 # =============================== DETECTION =================================================
 
-car.activatePID()
-print(car.isPIDActive() + "\n") 
-car.updateSpeed(0.09)
-print(car.getCurrentSpeed() + "\n")
-car.goForward(2, 0.2)
-car.activatePID(False)
-print(car.isPIDActive() + "\n") 
+
 
 
 # ===================================== START PROCESSES ==================================
@@ -116,7 +118,16 @@ for proc in allProcesses:
     proc.daemon = True
     proc.start()
 
-
+# count = 0
+# car.activatePID()
+# print(car.isPIDActive()) 
+# car.updateSpeed(0.09)
+# time.sleep(1)
+# while car.getCurrentSpeed() < 0.2:
+#     car.adjustSpeed(0.01)
+#     print(car.getCurrentSpeed())
+#     time.sleep(0.5)
+# car.brake(0)
 
 # ===================================== STAYING ALIVE ====================================
 blocker = Event()  

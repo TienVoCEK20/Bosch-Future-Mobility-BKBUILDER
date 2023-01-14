@@ -31,26 +31,31 @@ from threading import Thread
 # Module used for communication
 import socket
 import json
+from src.templates.threadwithstop import ThreadWithStop
 
 ##  listener class. 
 #
 #  Class used for running port listener algorithm 
-class vehicletovehicle(Thread):
+class vehicletovehicle(ThreadWithStop):
     
     def __init__(self):
         """listener class. 
         
         Class used for running port listener algorithm 
         """
+        super(vehicletovehicle,self).__init__()
         super(vehicletovehicle,self).start()
 
+        #self.daemon = True
         # Values extracted from message
         self.ID = 0
         self.timestamp = 0.0
         self.pos = complex(0,0)
         self.ang = complex(0,0)
+        print("here1")
 
         self._init_socket()
+        print("here2")
 
         # Flag indincating thread state
         self.__running = True
@@ -61,14 +66,15 @@ class vehicletovehicle(Thread):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #(internet, UDP)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        self.sock.bind(('', self.PORT))
-        self.sock.settimeout(1)
-
-
+        self.sock.bind(('192.168.1.11', self.PORT))
+        self.sock.settimeout(2)
+        
     def run(self):
-        while self.__running:
+        #while self.__running:
+        while True:
             try:
                 data,_ = self.sock.recvfrom(4096)
+                #print(data)
                 data = data.decode("utf-8") 
                 data = json.loads(data)
 
@@ -79,6 +85,9 @@ class vehicletovehicle(Thread):
                 self.pos = complex(data['coor'])
 
                 self.ang = complex(data['rot'])
+                
+                print(self.pos)
+                
             except Exception as e:
                 print("Receiving data failed with error: " + str(e))
 
@@ -86,3 +95,4 @@ class vehicletovehicle(Thread):
     #  @param self          The object pointer.
     def stop(self):
         self.__running = False
+
