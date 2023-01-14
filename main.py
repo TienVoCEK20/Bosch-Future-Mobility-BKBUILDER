@@ -74,7 +74,7 @@ if enableStream:
         allProcesses.append(camProc)
     
     #   LANE DETECTION
-    laneDetectionProc = LaneDetectionProcess([camStR])
+    laneDetectionProc = LaneDetectionProcess([camStR], [])
     allProcesses.append(laneDetectionProc)
 
     #   DETECTION
