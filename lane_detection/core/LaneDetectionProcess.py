@@ -15,9 +15,20 @@ class LaneDetectionProcess(WorkerProcess):
         self.threads = list()
 
     def _init_threads(self):
-        return super()._init_threads()
+
+        if self._blocker.is_set():
+            return
+
+        sendBirdEyeThread = Thread(name = "sendBirdEye", target=self._send_threads, args = (self.inPs[0],))
+        sendBirdEyeThread.daemon = True
+        self.threads.append(sendBirdEyeThread)
 
     def run(self):
+        
+        super(LaneDetectionProcess, self).run()
+    
+    def _send_threads(self, inP):
+
         """
         Keys:
             birdeye_img: frame of bird eye view -> Shape (360, 640)
@@ -28,5 +39,7 @@ class LaneDetectionProcess(WorkerProcess):
             canny: edges
 
         """
-        processing_result = self.camera.laneDetector.processor.process(self.inPs)
-        return processing_result
+        processing_result = self.camera.laneDetector.processor.process(inP)
+        for outP in self.outPs:
+            outP.send([processing_result])
+         

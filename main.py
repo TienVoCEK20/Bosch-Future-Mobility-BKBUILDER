@@ -64,7 +64,7 @@ allProcesses = list()
 if enableStream:
     camStR, camStS = Pipe(duplex = True)           # camera  ->  streamer
     camDtR, camDtS = Pipe(duplex= False)
-    # camDtLR, camDtLS = Pipe(duplex=False)
+    camDtLR, camDtLS = Pipe(duplex=False)
     if enableCameraSpoof:
         camSpoofer = CameraSpooferProcess([],[camStS],videoDir='/home/pi/Bosch-Future-Mobility-BKBUILDER/testvideo/',ext='.avi')
         allProcesses.append(camSpoofer)
