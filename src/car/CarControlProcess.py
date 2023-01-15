@@ -50,6 +50,9 @@ class CarControl(WorkerProcess):
     def isPIDActive(self):
         return self.pid_active
 
+    def checkInPs(self):
+        print(self.lane_result)
+
     def updateSpeed(self, speed):
         self.current_speed = speed
         _speed =    {
@@ -130,7 +133,7 @@ class CarControl(WorkerProcess):
     
     ''' Compute steering angle based on Vu Thanh Dat's DR2020 code '''
     def angleCalculator(self, x, y):
-        slope = (x - 72) / float(y - 144) # (320, 360) is center of (640, 360) image
+        slope = (x - 180) / float(y - 640) # (180, 640) is center of (360, 640) image
         angleRadian = float(math.atan(slope))
         angleDegree = float(angleRadian * 180.0 / math.pi)
         return angleDegree
@@ -139,10 +142,10 @@ class CarControl(WorkerProcess):
         count = 0
         center_x = 0
         center_y = 0 
-        
-        for i in range(0,144):
-            for j in range(0,144):
-                if roadImg[i][j] == 255:
+        angleDegree = 0
+        for i in range(0,320):
+            for j in range(0,640):
+                if roadImg[i][j] is 255:
                     count += 1
                     center_x += i
                     center_y += j
@@ -155,10 +158,10 @@ class CarControl(WorkerProcess):
 
         return angleDegree
         
-    def brake(self, break_steerAngle):
+    def brake(self, brake_steerAngle):
         _brake = {  
                 "action": "3",
-                "brake (steerAngle)": float(break_steerAngle)
+                "brake (steerAngle)": float(brake_steerAngle)
             }
         print(_brake) 
         self.control[0].send(_brake)

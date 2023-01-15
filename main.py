@@ -46,7 +46,7 @@ from src.hardware.serialhandler.SerialHandlerProcess        import SerialHandler
 # utility imports
 from src.utils.camerastreamer.CameraStreamerProcess         import CameraStreamerProcess
 from src.utils.remotecontrol.RemoteControlReceiverProcess   import RemoteControlReceiverProcess
-from lane_detection.core.LaneDetectionProcess import LaneDetectionProcess
+from lane_detection.core.LaneDetectionProcess               import LaneDetectionProcess
 # detection imports
 from src.utils.detection.DetectionProcess                   import DetectionProcess
 
@@ -60,11 +60,12 @@ enableServer        =  False
 # =============================== INITIALIZING PROCESSES =================================
 allProcesses = list()
 
+camStR, camStS = Pipe(duplex = True)           # camera  ->  streamer
+camDtR, camDtS = Pipe(duplex= False)
+camDtLR, camDtLS = Pipe(duplex=False)
+
 # =============================== HARDWARE ===============================================
 if enableStream:
-    camStR, camStS = Pipe(duplex = True)           # camera  ->  streamer
-    camDtR, camDtS = Pipe(duplex= False)
-    camDtLR, camDtLS = Pipe(duplex=False)
     if enableCameraSpoof:
         camSpoofer = CameraSpooferProcess([],[camStS],videoDir='/home/pi/Bosch-Future-Mobility-BKBUILDER/testvideo/',ext='.avi')
         allProcesses.append(camSpoofer)
@@ -80,7 +81,7 @@ if enableStream:
     #   DETECTION
     detectionProc = DetectionProcess([camStR], [camDtS])
     allProcesses.append(detectionProc)
-    #STREAM
+    #   STREAM
     streamProc = CameraStreamerProcess([camDtR], [])
     allProcesses.append(streamProc)
 
@@ -109,7 +110,7 @@ if enableRc:
     allProcesses.append(shProc)
     #print(rcShR)
     #rcProc = RemoteControlReceiverProcess([],[rcShS])
-    rcProc = CarControl([],[rcShS])
+    rcProc = CarControl([camDtLR, camDtR],[rcShS])
     car = rcProc
     allProcesses.append(rcProc)
 
@@ -124,20 +125,29 @@ for proc in allProcesses:
     proc.daemon = True
     proc.start()
 
-print(laneDetectionProc._image_process_results_return())
+# count = 0
+# while count <= 100000:
+#     count += 1
+#     print(car.computeCenter())
 
-count = 0
-car.activatePID()
-print(car.isPIDActive()) 
-car.updateSpeed(0.09)
-time.sleep(1)
-while car.getCurrentSpeed() < 0.2:
-    car.adjustSpeed(0.01)
-    print(car.getCurrentSpeed())
-    time.sleep(0.5)
-car.brake(0)
+# car.checkInPs()
 
-# ===================================== STAYING ALIVE ====================================
+################ BIRD EYE VIEW - ANGLE CALCULATOR   ########################
+
+try:
+    frame = camDtLR.recv()[0]       
+    birdeye_img = frame['thresh']                   
+    steer_angle = car.computeCenter(birdeye_img)
+    print("Steering angle: {}".format(steer_angle))
+except Exception as e:
+    print(e)
+
+############################################################
+# print(rows * cols)
+#processing_result = laneDetectionProc.camera.laneDetector.processor.process(frame)
+#print(car.computeCenter(frame))
+
+
 blocker = Event()  
 
 try:
