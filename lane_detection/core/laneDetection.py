@@ -107,10 +107,10 @@ class Preprocessor:
 
         H = img.shape[0]
         W = img.shape[1]
-        wTop = 112 
-        hTop = 186 
-        wBot = 100
-        hBot = 208 
+        wTop = 82 
+        hTop = 170 
+        wBot = 20 
+        hBot = 312 
         birdeyeView = dict()
 
         src = np.array([[wTop, hTop], [W- wTop, hTop], [wBot, hBot], [W- wBot, hBot]], dtype = np.float32)
@@ -193,7 +193,7 @@ class LaneDetection:
 
         self.processor = Preprocessor()
         self.ym_per_pix = 30 / 360 
-        self.xm_per_pix = 3.7 / 600 
+        self.xm_per_pix = 3.7 /640 
     
 
     def slide_window_search(self, binary_warped):
@@ -245,44 +245,14 @@ class LaneDetection:
 
             left_lane_inds = np.concatenate(left_lane_inds)
             right_lane_inds = np.concatenate(right_lane_inds)
-            # leftx = nonzerox[left_lane_inds]
-            # lefty = nonzeroy[left_lane_inds]
-            # rightx = nonzerox[right_lane_inds]
-            # righty = nonzeroy[right_lane_inds]
-
-            # Apply 2nd degree polynomial fit to fit curves
-            # print("Leftx: {}\nRightx:{}\nLefty:{}\nRighty:{}\n".format(leftx, rightx, lefty, righty))
-            # left_fit = np.polyfit(lefty, leftx, 2)
-            # right_fit = np.polyfit(righty, rightx, 2)
-
-
-            # ploty = np.linspace(0, binary_warped.shape[0]-1, binary_warped.shape[0])
-            # left_fitx = left_fit[0] * ploty**2 + left_fit[1] * ploty + left_fit[2]
-            # right_fitx = right_fit[0] * ploty**2 + right_fit[1] * ploty + right_fit[2]
-
-            # ltx = np.trunc(left_fitx)
-            # rtx = np.trunc(right_fitx)
-            # plt.plot(right_fitx)
-            # plt.show()
-
+            
             out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
             out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
-
-
-            # plt.imshow(out_img)
-            # plt.plot(left_fitx,  ploty, color = 'yellow')
-            # plt.plot(right_fitx, ploty, color = 'yellow')
-            # plt.xlim(0, 1280)
-            # plt.ylim(720, 0)
+            
             result = dict()
             result['left_lane_inds'] = leftx_current
             result['right_lane_inds'] = right_lane_inds
             result['out_img'] = out_img
-            # result['ploty'] = ploty
-            # result['left_fitx'] = left_fitx
-            # result['right_fitx'] = right_fitx
-            # result['left_fit'] = left_fit
-            # result['right_fit'] = right_fit
             
             return result
         

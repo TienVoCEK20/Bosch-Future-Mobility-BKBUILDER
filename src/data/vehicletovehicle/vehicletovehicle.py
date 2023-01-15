@@ -52,11 +52,8 @@ class vehicletovehicle(ThreadWithStop):
         self.timestamp = 0.0
         self.pos = complex(0,0)
         self.ang = complex(0,0)
-        print("here1")
 
         self._init_socket()
-        print("here2")
-
         # Flag indincating thread state
         self.__running = True
 
@@ -66,7 +63,7 @@ class vehicletovehicle(ThreadWithStop):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #(internet, UDP)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        self.sock.bind(('192.168.1.11', self.PORT))
+        self.sock.bind(('192.168.1.14', self.PORT))
         self.sock.settimeout(2)
         
     def run(self):
@@ -86,7 +83,7 @@ class vehicletovehicle(ThreadWithStop):
 
                 self.ang = complex(data['rot'])
                 
-                print(self.pos)
+                print("id: {}, coor: {}".format(self.ID,self.pos))
                 
             except Exception as e:
                 print("Receiving data failed with error: " + str(e))

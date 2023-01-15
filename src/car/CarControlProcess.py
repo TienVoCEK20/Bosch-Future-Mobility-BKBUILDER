@@ -3,7 +3,7 @@ import socket
 import math
 import time
 import numpy as np
-
+import cv2 as cv
 from threading       import Thread
 
 from src.templates.workerprocess import WorkerProcess
@@ -33,14 +33,16 @@ class CarControl(WorkerProcess):
         
         self.current_speed = 0
         self.pid_active = False
+        self.activatePID()
     # ===================================== RUN ==========================================
-    # def run(self):
-    #     """Apply the initializing methods and start the threads
-    #     """
-    #     super(CarControl,self).run()
+    def run(self):
+        """Apply the initializing methods and start the threads
+        """
+        super(CarControl,self).run()
+
     def activatePID(self, activate = True):
         self.pid_active = activate
-        _activate= {
+        _activate = {
                     "action": "4",
                     "activate": self.pid_active
                 }
@@ -92,9 +94,9 @@ class CarControl(WorkerProcess):
         if x == 0 and y == 0:
             steer = 0
         elif x <= 0:
-            steer = -60
+            steer = -23
         elif x >= 360:
-            steer = 60
+            steer = 23
         else:
             smooth_x = 5 * (x // 5)
             error = smooth_x - 180
@@ -127,36 +129,38 @@ class CarControl(WorkerProcess):
             if math.isnan(steer):
                 steer = 0
                 
-            if abs(steer) > 60:
-                steer = np.sign(steer) * 60
+            if abs(steer) > 23:
+                steer = np.sign(steer) * 23
         return int(steer)
     
     ''' Compute steering angle based on Vu Thanh Dat's DR2020 code '''
     def angleCalculator(self, x, y):
-        slope = (x - 180) / float(y - 640) # (180, 640) is center of (360, 640) image
-        angleRadian = float(math.atan(slope))
-        angleDegree = float(angleRadian * 180.0 / math.pi)
+        angleDegree = 0
+
+        if x != 0 or y != 0:
+            slope = (x - 72) / float (y - 144) # (72, 144) is center of (144, 144) image
+            angleRadian = float(math.atan(slope))
+            angleDegree = float(angleRadian * 180.0 / math.pi)
+
         return angleDegree
     
     def computeCenter(self, roadImg):
         count = 0
         center_x = 0
-        center_y = 0 
-        angleDegree = 0
-        for i in range(0,320):
-            for j in range(0,640):
-                if roadImg[i][j] is 255:
+        center_y = 0
+        for i in range(0, 144):
+            for j in range(0, 144):
+                if roadImg[i][j] == 255:
                     count += 1
-                    center_x += i
-                    center_y += j
+                    center_x += j
+                    center_y += i
     
 
         if center_x != 0 or center_y != 0 or count != 0:
             center_x = center_x / count
-            center_x = center_y / count
-            angleDegree = self.angleCalculator(center_x, center_y) # Call angle_calculator method in speed_up.py to use numba function
+            center_y = center_y / count
 
-        return angleDegree
+        return center_x, center_y
         
     def brake(self, brake_steerAngle):
         _brake = {  
@@ -166,28 +170,35 @@ class CarControl(WorkerProcess):
         print(_brake) 
         self.control[0].send(_brake)
 #  # ===================================== INIT THREADS =================================
-#     def _init_threads(self):
-#         """Initialize the read thread to transmite the received messages to other processes. 
-#         """
-#         readTh = Thread(name='ReceiverCommandThread',target = self._read_stream, args = (self.outPs, ))
-#         self.threads.append(readTh)
+    def _init_threads(self):
+        """Initialize the read thread to transmite the received messages to other processes. 
+        """
+        readTh = Thread(name='ReceiverCommandThread',target = self._read_stream, args = (self.outPs, ))
+        self.threads.append(readTh)
 
-#     # ===================================== READ STREAM ==================================
-#     def _read_stream(self, outPs):
-#         """Receive the message and forwards them to the SerialHandlerProcess. 
+    # ===================================== READ STREAM ==================================
+    def _read_stream(self, outPs):
+        """Receive the message and forwards them to the SerialHandlerProcess. 
         
-#         Parameters
-#         ----------
-#         outPs : list(Pipe)
-#             List of the output pipes.
-#         """
-#         try:
-#             while True:
-#                 #print("hello")
-#                 if self.activate: 
-#                     self.activate = 0
-#                     self.activatePID()
-#                     self.goForward(1,0.09)
-
-#         except Exception as e:
-#             print(e)
+        Parameters
+        ----------
+        outPs : list(Pipe)
+            List of the output pipes.
+        """
+        try:
+            while True:
+                # print("hello")
+                frame = self.lane_result.recv()[0]
+                birdeye_img = frame['thresh']    
+                birdeye_img = cv.resize(birdeye_img, (144,144))   
+                print("sum of thresh: {}".format(np.sum(birdeye_img)))
+                print(birdeye_img)            
+                center_x, center_y = self.computeCenter(birdeye_img)
+                print("center_x: {}\ncenter_y: {}".format(center_x, center_y))
+                steer_angle = self.angleCalculator(center_x, center_y)
+                print("Steering angle: {}".format(steer_angle))
+                self.steerAngle(steer_angle)
+                #self.steerAngle(10)
+        except Exception as e:
+            print(e)
+            #2:0.00;;

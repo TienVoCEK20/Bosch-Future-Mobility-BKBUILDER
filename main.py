@@ -53,10 +53,10 @@ from src.utils.detection.DetectionProcess                   import DetectionProc
 #server imports
 from src.utils.server.ServerReceiverProcess                 import ServerReceiverProcess
 # =============================== CONFIG =================================================
-enableStream        =  True
-enableCameraSpoof   =  True 
-enableRc            =  True
-enableServer        =  False
+enableStream        =  False
+enableCameraSpoof   =  False 
+enableRc            =  False
+enableServer        =  True
 # =============================== INITIALIZING PROCESSES =================================
 allProcesses = list()
 
@@ -67,22 +67,22 @@ camDtLR, camDtLS = Pipe(duplex=False)
 # =============================== HARDWARE ===============================================
 if enableStream:
     if enableCameraSpoof:
-        camSpoofer = CameraSpooferProcess([],[camStS],videoDir='/home/pi/Bosch-Future-Mobility-BKBUILDER/testvideo/',ext='.avi')
+        camSpoofer = CameraSpooferProcess([],[camStS],videoDir='/home/pi/Bosch-Future-Mobility-BKBUILDER/testvideo/vid1',ext='.avi')
         allProcesses.append(camSpoofer)
 
     else:
         camProc = CameraProcess([],[camStS])
         allProcesses.append(camProc)
     
-    #   LANE DETECTION
+    #  LANE DETECTION
     laneDetectionProc = LaneDetectionProcess([camStR], [camDtLS])
     allProcesses.append(laneDetectionProc)
     
-    #   DETECTION
+    #  DETECTION
     detectionProc = DetectionProcess([camStR], [camDtS])
     allProcesses.append(detectionProc)
     #   STREAM
-    streamProc = CameraStreamerProcess([camDtR], [])
+    streamProc = CameraStreamerProcess([camStR], [])
     allProcesses.append(streamProc)
 
 # =============================== SERVER ===================================================
@@ -124,6 +124,7 @@ print("Starting the processes!",allProcesses)
 for proc in allProcesses:
     proc.daemon = True
     proc.start()
+start_time = time.time()
 
 # count = 0
 # while count <= 100000:
@@ -133,14 +134,16 @@ for proc in allProcesses:
 # car.checkInPs()
 
 ################ BIRD EYE VIEW - ANGLE CALCULATOR   ########################
-
-try:
-    frame = camDtLR.recv()[0]       
-    birdeye_img = frame['thresh']                   
-    steer_angle = car.computeCenter(birdeye_img)
-    print("Steering angle: {}".format(steer_angle))
-except Exception as e:
-    print(e)
+# steer_angle = 0
+# try:
+#     while True:
+#         frame = camDtLR.recv()[0]       
+#         birdeye_img = frame['thresh']                   
+#         center_x, center_y = car.computeCenter(birdeye_img)
+#         steer_angle = car.angleCalculator(center_x, center_y)
+#         print("Steering angle: {}".format(steer_angle))
+# except Exception as e:
+#     print(e)
 
 ############################################################
 # print(rows * cols)
@@ -153,6 +156,7 @@ blocker = Event()
 try:
     blocker.wait()
 except KeyboardInterrupt:
+    print("\nTime: {}".format(time.time() - start_time))
     print("\nCatching a KeyboardInterruption exception! Shutdown all processes.\n")
     for proc in allProcesses:
         if hasattr(proc,'stop') and callable(getattr(proc,'stop')):
@@ -160,6 +164,6 @@ except KeyboardInterrupt:
             proc.stop()
             proc.join()
         else:
-            print("Process witouth stop",proc)
+            print("Process without stop",proc)
             proc.terminate()
             proc.join()

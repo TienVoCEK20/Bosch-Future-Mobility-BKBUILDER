@@ -57,7 +57,7 @@ class Broadcaster(Thread):
         
         # Communication parameters, create and bind socket
         self.PORT = PORT
-        self.BCAST_ADDRESS = '192.168.0.101'
+        self.BCAST_ADDRESS = '192.168.1.14'
 
         # Create a UDP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -111,7 +111,7 @@ class Broadcaster(Thread):
         # Get new coordinates from listener
         coor = self.__position_listener.coor
         # Construct message to be sent
-        value = {'id':id, 'coor':str(coor[0]), 'rot':str(coor[1])}
+        value = {'timestamp':1 ,'id':id, 'coor':str(coor[0]), 'rot':str(coor[1])}
         message = json.dumps(value)
         # Debug msg
         print('sending {!r}'.format(message))

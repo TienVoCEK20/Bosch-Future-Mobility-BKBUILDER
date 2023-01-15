@@ -75,6 +75,7 @@ class imu(threading.Thread):
 
 
                 print("roll = %f pitch = %f yaw = %f" % (self.roll,self.pitch,self.yaw))
+                #time.sleep(0.1)
                 time.sleep(self.poll_interval*1.0/1000.0)
 
     def stop(self): 

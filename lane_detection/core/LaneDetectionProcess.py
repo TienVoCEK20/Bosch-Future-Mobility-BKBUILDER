@@ -1,6 +1,7 @@
 import numpy as np
 from .camera import Camera
 from threading import Thread
+import cv2 as cv
 
 from src.templates.workerprocess import WorkerProcess
 
@@ -39,11 +40,13 @@ class LaneDetectionProcess(WorkerProcess):
             canny: edges
 
         """
-        timestamp, frame = inP.recv()
-        processing_result = self.camera.laneDetector.processor.process(frame)
-
-        for outP in self.outPs:
-            outP.send([processing_result])
+        while True:
+            timestamp, frame = inP.recv()
+            # frame = cv.resize(frame, (144,144))
+            processing_result = self.camera.laneDetector.processor.process(frame)
+            #print(processing_result['thresh'].shape)
+            for outP in self.outPs:
+                outP.send([processing_result])
     
 
          
