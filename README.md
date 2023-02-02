@@ -22,7 +22,11 @@ docker pull osrf/ros:noetic-desktop-fulll
 ```
 
 Run the container to verify the installation of ROS (don't forget the root admission if u use Ubuntu). We also
-want to communicate between several containers, so we need to specify the network by flag **"--net=host"**
+want to communicate between several containers, so we need to specify the network by flag **"--net=host"**. Run the following command to see the information of the image pulled.
+```
+docker image ls
+```
+Then run the following command to get the container
 ```
 docker run -it --net=host <repository>:TAG
 ```
