@@ -21,15 +21,16 @@ Others:
 docker pull osrf/ros-noetic-desktop-fulll 
 ```
 
-Run the container to verify the installation of ROS (don't forget the root admission if u use Ubuntu)
+Run the container to verify the installation of ROS (don't forget the root admission if u use Ubuntu). We also
+want to communicate between several containers, so we need to specify the network by flag **"--net=host"**
 ```
-docker run <repository>:TAG
+docker run -it --net=host <repository>:TAG
 ```
 If everything is working well, we can see the root@<Tag>. If the docker container
 does not run properly, please try
 
 ```
-docker run -i -t <IMAGE-ID>
+docker run -i -t --net=host <IMAGE-ID>
 ```
 
 
