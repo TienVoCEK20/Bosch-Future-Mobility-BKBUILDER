@@ -49,7 +49,7 @@ class sim(Thread):
         
         # Communication parameters, create and bind socket
         self.PORT = 50007
-        self.BCAST_ADDRESS = '192.168.0.102'
+        self.BCAST_ADDRESS = '192.168.0.107'
 
         # Create a UDP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -99,7 +99,7 @@ class sim(Thread):
                 print("Sending data failed with error: " + str(e))
 
             # wait for 0.1 s before next broadcast msg
-            time.sleep(1)
+            time.sleep(0.1)
 
     def start(self):
         """Method for starting the process.

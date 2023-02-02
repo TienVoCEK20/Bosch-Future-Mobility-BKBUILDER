@@ -63,7 +63,7 @@ class vehicletovehicle(ThreadWithStop):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #(internet, UDP)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        self.sock.bind(('192.168.1.14', self.PORT))
+        self.sock.bind(('192.168.0.106', self.PORT))
         self.sock.settimeout(2)
         
     def run(self):

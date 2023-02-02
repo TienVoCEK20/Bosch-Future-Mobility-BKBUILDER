@@ -32,19 +32,28 @@ import socket
 import json
 
 
-class trafficlights(Thread):
-    def __init__(self):
+from src.templates.workerprocess import WorkerProcess
+
+
+
+class trafficlights(WorkerProcess):
+    def __init__(self, inPs, outPs):
         """listener class. 
         
         Class used for running port listener algorithm 
         """
-        super(trafficlights, self).__init__()
+        super(trafficlights, self).__init__(inPs, outPs)
         
+        self.inPs = inPs
+        self.outPs = outPs
+        self.threads = list()
+
+        #state = random.randint(1,4)
         # Semaphore states
-        self.s1_state=0 
-        self.s2_state=0 
-        self.s3_state=0 
-        self.s4_state=0 
+        self.s1_state=0
+        self.s2_state=0
+        self.s3_state=0
+        self.s4_state=0
 
         self._init_socket()
 
@@ -57,17 +66,19 @@ class trafficlights(Thread):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #(internet, UDP)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        self.sock.bind(('', self.PORT))
+        self.sock.bind(('192.168.0.107', self.PORT))
         self.sock.settimeout(1)
 
     def run(self):
         while self.__running:
             try:
                 data, addr = self.sock.recvfrom(4096) 
+                #print(data)
                 dat = data.decode('utf-8')
                 dat = json.loads(dat)
                 ID = int(dat['id'])
                 state = int(dat['state'])
+                # state = random.randint(1,4)
                 if (ID == 1):
                     self.s1_state=state
                 elif (ID == 2):
@@ -78,8 +89,16 @@ class trafficlights(Thread):
                     self.s4_state=state
 
             except Exception as e:
-                print("Receiving data failed with error: " + str(e))
+                 print("Receiving data failed with error: " + str(e))
 
+    def _send_threads(self, inP):
+        while True:
+            timestamp, frame = inP.recv()
+            # frame = cv.resize(frame, (144,144))
+            processing_result = self.camera.laneDetector.processor.process(frame)
+            #print(processing_result['thresh'].shape)
+            for outP in self.outPs:
+                outP.send([processing_result])
     
     def stop(self):
         """ Method for stopping listener process.

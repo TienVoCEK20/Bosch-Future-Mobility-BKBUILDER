@@ -7,6 +7,7 @@ import cv2 as cv
 from threading       import Thread
 
 from src.templates.workerprocess import WorkerProcess
+from src.data.trafficlights import trafficlights
 
 class CarControl(WorkerProcess):
     # ===================================== INIT =========================================
@@ -24,6 +25,7 @@ class CarControl(WorkerProcess):
         super(CarControl,self).__init__( inPs, outPs)
         self.lane_result = inPs[0]
         self.object_result = inPs[1]
+        self.traffic_light = inPs[2]
         self.control = outPs
         #print(self.control[0])
         self.activate = 1
@@ -87,7 +89,7 @@ class CarControl(WorkerProcess):
                 }
         print(_steer) 
         self.control[0].send(_steer)
-       
+    
     ''' Based on Mr. Ngo Duc Tuan's DR2020 code ''' 
     def steerPID(self, x, y):
         steer = 0
@@ -186,19 +188,37 @@ class CarControl(WorkerProcess):
             List of the output pipes.
         """
         try:
+            goOnce = 1
             while True:
+                # self.activatePID()
                 # print("hello")
-                frame = self.lane_result.recv()[0]
-                birdeye_img = frame['thresh']    
-                birdeye_img = cv.resize(birdeye_img, (144,144))   
-                print("sum of thresh: {}".format(np.sum(birdeye_img)))
-                print(birdeye_img)            
-                center_x, center_y = self.computeCenter(birdeye_img)
-                print("center_x: {}\ncenter_y: {}".format(center_x, center_y))
-                steer_angle = self.angleCalculator(center_x, center_y)
-                print("Steering angle: {}".format(steer_angle))
-                self.steerAngle(steer_angle)
-                #self.steerAngle(10)
+                # frame = self.lane_result.recv()[0]
+                # birdeye_img = frame['thresh']    
+                # birdeye_img = cv.resize(birdeye_img, (144,144))   
+                # print("sum of thresh: {}".format(np.sum(birdeye_img)))
+                # print(birdeye_img)            
+                # center_x, center_y = self.computeCenter(birdeye_img)
+                # print("center_x: {}\ncenter_y: {}".format(center_x, center_y))
+                # steer_angle = self.angleCalculator(center_x, center_y)
+                # print("Steering angle: {}".format(steer_angle))
+                if goOnce:
+                    goOnce = 0
+                    start_time = time.time()
+                    # Create listener object
+                    Semaphores = trafficlights.trafficlights()
+                    # Start the listener
+                    self.activatePID()
+                    Semaphores.start()
+                    angle = 23
+                    while (time.time()-start_time < 60):
+                        if(Semaphores.s1_state == 2):
+                            self.steerAngle(angle)
+                            angle = -angle
+                        time.sleep(0.5)
+                    #self.steerAngle(23)
+                    #self.adjustSpeed(0.2)
+                #self.steerAngle()
+                    Semaphores.stop()
         except Exception as e:
             print(e)
-            #2:0.00;;
+            #2:0.00;;CarControl

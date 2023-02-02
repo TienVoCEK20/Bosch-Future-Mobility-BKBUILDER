@@ -52,17 +52,22 @@ from src.utils.detection.DetectionProcess                   import DetectionProc
 
 #server imports
 from src.utils.server.ServerReceiverProcess                 import ServerReceiverProcess
+
+#trafficLight imports
+from src.data.trafficlights                                 import trafficlights
 # =============================== CONFIG =================================================
 enableStream        =  False
 enableCameraSpoof   =  False 
 enableRc            =  False
 enableServer        =  True
+enableTrafficLight = True #Tri them 
 # =============================== INITIALIZING PROCESSES =================================
 allProcesses = list()
 
 camStR, camStS = Pipe(duplex = True)           # camera  ->  streamer
 camDtR, camDtS = Pipe(duplex= False)
 camDtLR, camDtLS = Pipe(duplex=False)
+giaoThongIn, giaoThongOut = Pipe(duplex = False)
 
 # =============================== HARDWARE ===============================================
 if enableStream:
@@ -110,12 +115,17 @@ if enableRc:
     allProcesses.append(shProc)
     #print(rcShR)
     #rcProc = RemoteControlReceiverProcess([],[rcShS])
-    rcProc = CarControl([camDtLR, camDtR],[rcShS])
+    rcProc = CarControl([camDtLR, camDtR, giaoThongIn],[rcShS])
     car = rcProc
     allProcesses.append(rcProc)
 
 # =============================== DETECTION =================================================
 
+# ==============================TrafficLight=====================================
+if enableTrafficLight:
+        tinHieuGiaoThong = trafficlights([], [giaoThongOut])
+        allProcesses.append(tinHieuGiaoThong)
+        
 
 
 
