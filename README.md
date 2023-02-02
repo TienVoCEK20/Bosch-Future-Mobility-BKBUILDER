@@ -14,11 +14,11 @@ After successfully installing docker, we will pull ROS image from the Docker hub
 
 **Ubuntu** requires root admission to install
 ```
-sudo docker pull osrf/ros-noetic-desktop-full
+sudo docker pull osrf/ros:noetic-desktop-full
 ```
 Others:
 ```
-docker pull osrf/ros-noetic-desktop-fulll 
+docker pull osrf/ros:noetic-desktop-fulll 
 ```
 
 Run the container to verify the installation of ROS (don't forget the root admission if u use Ubuntu). We also
