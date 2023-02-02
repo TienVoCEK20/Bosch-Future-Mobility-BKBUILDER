@@ -100,13 +100,13 @@ class CameraThread(ThreadWithStop):
             self.camera.resolution      =   (1640,1232)
             self.camera.framerate       =   15
 
-            self.camera.brightness      =   80
+            self.camera.brightness      =   79
             self.camera.shutter_speed   =   1200
             self.camera.contrast        =   0
             self.camera.iso             =   0 # auto
             
 
-            self.imgSize                =   (640, 360)    # the actual image size
+            self.imgSize                =   (640, 480)    # the actual image size
         else:
             import cv2
             self.camera = cv2.VideoCapture(0)
