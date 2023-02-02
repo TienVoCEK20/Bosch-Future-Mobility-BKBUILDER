@@ -25,6 +25,13 @@ Run the container to verify the installation of ROS (don't forget the root admis
 ```
 docker run <repository>:TAG
 ```
+If everything is working well, we can see the root@<Tag>. If the docker container
+does not run properly, please try
+
+```
+docker run -i -t <IMAGE-ID>
+```
+
 
 
 
