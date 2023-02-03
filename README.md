@@ -18,7 +18,7 @@ sudo docker pull osrf/ros:noetic-desktop-full
 ```
 Others:
 ```
-docker pull osrf/ros:noetic-desktop-fulll 
+docker pull osrf/ros:noetic-desktop-full
 ```
 
 Run the container to verify the installation of ROS (don't forget the root admission if u use Ubuntu). We also
